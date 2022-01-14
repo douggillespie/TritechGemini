@@ -11,9 +11,9 @@ import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.datamenus.DataMenuParent;
-import tritechplugin.GeminiControl;
-import tritechplugin.GeminiLocationParams;
-import tritechplugin.GeminiProcess;
+import tritechgemini.GeminiControl;
+import tritechgemini.GeminiLocationParams;
+import tritechgemini.GeminiProcess;
 
 public class Target2DataUnit extends PamDataUnit<PamDataUnit, PamDataUnit> {
 /*

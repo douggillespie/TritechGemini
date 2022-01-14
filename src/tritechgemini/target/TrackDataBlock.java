@@ -8,10 +8,10 @@ import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import annotation.handler.AnnotationHandler;
 import pamScrollSystem.ViewLoadObserver;
+import tritechgemini.GeminiProcess;
 import tritechgemini.annotation.TrackAnnotationHandler;
 import tritechgemini.dataselect.TrackDataSelectCreator;
 import tritechgemini.swing.TrackSymbolManager;
-import tritechplugin.GeminiProcess;
 
 public class TrackDataBlock extends SuperDetDataBlock<TrackDataUnit, Target2DataUnit> {
 

@@ -8,9 +8,9 @@ import PamUtils.PamCalendar;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.component.DataBlockTableView;
+import tritechgemini.GeminiControl;
 import tritechgemini.target.TrackDataBlock;
 import tritechgemini.target.TrackDataUnit;
-import tritechplugin.GeminiControl;
 
 public class GeminiTrackTable extends DataBlockTableView<TrackDataUnit>{
 	

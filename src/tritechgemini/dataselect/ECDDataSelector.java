@@ -6,9 +6,9 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
+import tritechgemini.GeminiControl;
 import tritechgemini.tritech.ECDDataBlock;
 import tritechgemini.tritech.ECDDataUnit;
-import tritechplugin.GeminiControl;
 
 public class ECDDataSelector extends DataSelector {
 	

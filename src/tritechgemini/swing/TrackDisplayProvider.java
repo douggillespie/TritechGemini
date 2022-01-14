@@ -1,6 +1,6 @@
 package tritechgemini.swing;
 
-import tritechplugin.GeminiControl;
+import tritechgemini.GeminiControl;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
 import userDisplay.UserDisplayProvider;

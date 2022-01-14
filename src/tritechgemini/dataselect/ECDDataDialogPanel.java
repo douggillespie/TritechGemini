@@ -10,7 +10,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
-import tritechplugin.GeminiControl;
+import tritechgemini.GeminiControl;
 
 public class ECDDataDialogPanel implements PamDialogPanel {
 	

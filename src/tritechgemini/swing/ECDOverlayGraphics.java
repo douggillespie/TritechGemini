@@ -29,15 +29,15 @@ import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamView.PamColors;
 import PamView.PamKeyItem;
+import tritechgemini.GeminiControl;
+import tritechgemini.GeminiLocationParams;
+import tritechgemini.GeminiParameters;
 import tritechgemini.dataselect.ECDDataSelectParams;
 import tritechgemini.dataselect.ECDDataSelector;
 import tritechgemini.tritech.ECDDataBlock;
 import tritechgemini.tritech.ecd.ECDRecordSet;
 import tritechgemini.tritech.image.ECDImage;
 import tritechgemini.tritech.image.ECDImageMaker;
-import tritechplugin.GeminiControl;
-import tritechplugin.GeminiLocationParams;
-import tritechplugin.GeminiParameters;
 
 public class ECDOverlayGraphics extends PanelOverlayDraw {
 

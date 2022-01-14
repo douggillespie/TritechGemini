@@ -20,11 +20,11 @@ import PamView.panel.PamAlignmentPanel;
 import annotation.handler.AnnotationsSelectionPanel;
 import dataMap.filemaps.OfflineFileDialogPanel;
 import dataMap.filemaps.OfflineFileParameters;
+import tritechgemini.GeminiControl;
+import tritechgemini.GeminiLocationParams;
+import tritechgemini.GeminiParameters;
 import tritechgemini.target.TargetType;
 import tritechgemini.tritech.OfflineEDCfileServer;
-import tritechplugin.GeminiControl;
-import tritechplugin.GeminiLocationParams;
-import tritechplugin.GeminiParameters;
 
 public class GeminiDialog extends PamView.dialog.PamDialog {
 	

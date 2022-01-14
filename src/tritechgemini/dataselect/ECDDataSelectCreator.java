@@ -3,8 +3,8 @@ package tritechgemini.dataselect;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
+import tritechgemini.GeminiControl;
 import tritechgemini.tritech.ECDDataBlock;
-import tritechplugin.GeminiControl;
 
 public class ECDDataSelectCreator extends DataSelectorCreator {
 

@@ -24,10 +24,10 @@ import PamView.symbol.PamSymbolChooser;
 import PamguardMVC.PamDataUnit;
 import pamMaths.PamQuaternion;
 import pamMaths.PamVector;
+import tritechgemini.GeminiControl;
+import tritechgemini.GeminiLocationParams;
+import tritechgemini.GeminiParameters;
 import tritechgemini.target.Target2DataUnit;
-import tritechplugin.GeminiControl;
-import tritechplugin.GeminiLocationParams;
-import tritechplugin.GeminiParameters;
 
 public class Target2Graphics extends PanelOverlayDraw {
 

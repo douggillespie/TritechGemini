@@ -7,7 +7,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.PamSidePanel;
 import PamView.panel.PamPanel;
-import tritechplugin.GeminiControl;
+import tritechgemini.GeminiControl;
 
 public class GeminiSidePanel implements PamSidePanel {
 

@@ -15,7 +15,7 @@ import dataMap.OfflineDataMapPoint;
 import dataMap.filemaps.FileDataMapPoint;
 import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.ViewLoadObserver;
-import tritechplugin.GeminiControl;
+import tritechgemini.GeminiControl;
 
 public class ECDOfflineStore implements OfflineFileDataStore {
 

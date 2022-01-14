@@ -8,10 +8,10 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import dataMap.OfflineDataMap;
 import pamScrollSystem.ViewLoadObserver;
+import tritechgemini.GeminiProcess;
 import tritechgemini.dataselect.ECDDataSelectCreator;
 import tritechgemini.tritech.ecd.ECDRecordSet;
 import tritechgemini.tritech.image.ECDImageMaker;
-import tritechplugin.GeminiProcess;
 
 public class ECDDataBlock extends PamDataBlock<ECDDataUnit> {
 

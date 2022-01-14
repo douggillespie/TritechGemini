@@ -13,7 +13,7 @@ import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
 import generalDatabase.SuperDetLogging;
 import pamScrollSystem.ViewLoadObserver;
-import tritechplugin.GeminiControl;
+import tritechgemini.GeminiControl;
 
 public class TrackLogging extends SuperDetLogging {
 

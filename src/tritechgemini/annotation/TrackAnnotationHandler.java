@@ -7,8 +7,8 @@ import annotation.handler.AnnotationChoiceHandler;
 import annotation.handler.AnnotationChoices;
 import annotation.string.StringAnnotationType;
 import annotation.userforms.UserFormAnnotationType;
+import tritechgemini.GeminiControl;
 import tritechgemini.target.TrackDataBlock;
-import tritechplugin.GeminiControl;
 
 public class TrackAnnotationHandler extends AnnotationChoiceHandler {
 	
