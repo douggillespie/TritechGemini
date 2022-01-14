@@ -1,5 +1,6 @@
 package tritechplugin.swing;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -14,28 +15,35 @@ import javax.swing.border.TitledBorder;
 import PamView.ColourArray.ColourArrayType;
 import PamView.ColourComboBox;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.PamAlignmentPanel;
+import PamView.panel.PamNorthPanel;
 import PamView.symbol.SwingSymbolOptionsPanel;
 
 public class ECDSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 
 	private ECDSymbolChooser ecdSymbolChooser;
 	
-	private JPanel mainPanel;
+	private JPanel northPanel;
 
 	private ColourComboBox colourComboBox;
 	
 	private JCheckBox scaleOpacity;
 	
+	private JCheckBox combinedImage;
+	
 	private JLabel colourName;
 
 	public ECDSymbolOptionsPanel(ECDSymbolChooser ecdSymbolChooser) {
 		this.ecdSymbolChooser = ecdSymbolChooser;
-		mainPanel = new JPanel(new GridBagLayout());
+		JPanel mainPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		mainPanel.setBorder(new TitledBorder("Image colour"));
+		mainPanel.setBorder(new TitledBorder("Image colour map"));
+		combinedImage = new JCheckBox("Combine image");
 		colourComboBox=new ColourComboBox(130,20);
 		scaleOpacity = new JCheckBox("Scale transparancy");
-		mainPanel.add(new JLabel("Colour: ", JLabel.LEFT), c);
+		mainPanel.add(combinedImage, c);
+		c.gridy++;
+		mainPanel.add(new JLabel("Colour map: ", JLabel.LEFT), c);
 		c.gridx++;
 		mainPanel.add(colourName = new JLabel("         "), c);
 		c.gridy++;
@@ -53,11 +61,41 @@ public class ECDSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 			}
 
 		});
+		combinedImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				combineImageAction();
+			}
+		});
+		combinedImage.setToolTipText("combine multiple sonar images into a single image with a primary colour for each sonar (red, blue, green)");
+		colourComboBox.setToolTipText("Colour map for single sonars");
+		scaleOpacity.setToolTipText("Scale image opacity by sonar intensity");
+		
+		northPanel = new PamAlignmentPanel(mainPanel, BorderLayout.NORTH);
+		
+	}
+
+	protected void combineImageAction() {
+		enableControls();
+	}
+
+	private void enableControls() {
+		int nSonars = ecdSymbolChooser.getGeminiControl().getGeminiParameters().nSonars;
+		if (nSonars < 2) {
+			combinedImage.setEnabled(false);
+			combinedImage.setSelected(false);
+			colourComboBox.setEnabled(true);
+		}
+		else {
+			combinedImage.setEnabled(true);
+			boolean isComb = combinedImage.isSelected();
+			colourComboBox.setEnabled(isComb == false);
+		}
 	}
 
 	@Override
 	public JComponent getDialogComponent() {
-		return mainPanel;
+		return northPanel;
 	}
 
 	private void sayColour() {
@@ -72,6 +110,8 @@ public class ECDSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 		ECDSymbolOptions params = ecdSymbolChooser.getSymbolOptions();
 		colourComboBox.setSelectedColourMap(params.getColourArrayType());
 		scaleOpacity.setSelected(params.isScaleOpacity());
+		combinedImage.setSelected(params.isCombineSingleImage());
+		enableControls();
 		sayColour();
 	}
 
@@ -80,6 +120,7 @@ public class ECDSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 		ECDSymbolOptions params = ecdSymbolChooser.getSymbolOptions();
 		params.setColourArrayType(colourComboBox.getSelectedColourMap());
 		params.setScaleOpacity(scaleOpacity.isSelected());
+		params.setCombineSingleImage(combinedImage.isSelected());
 		ecdSymbolChooser.configureImageMaker();
 		return true;
 	}

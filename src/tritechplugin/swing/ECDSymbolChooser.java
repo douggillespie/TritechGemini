@@ -1,30 +1,32 @@
 package tritechplugin.swing;
 
-import PamView.ColourArray;
 import PamView.GeneralProjector;
 import PamView.symbol.PamSymbolChooser;
-import PamView.symbol.PamSymbolManager;
 import PamView.symbol.PamSymbolOptions;
 import PamView.symbol.SwingSymbolOptionsPanel;
 import PamView.symbol.SymbolData;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import tritechplugin.GeminiControl;
 import tritechplugin.tritech.ECDDataBlock;
-import tritechplugin.tritech.image.ECDImageMaker;
 
 public class ECDSymbolChooser extends PamSymbolChooser{
 	
 	public ECDSymbolOptions ecdSymbolOptions = new ECDSymbolOptions();
 	
-	private ECDImageMaker ecdImageMaker;
+//	private ECDImageMaker ecdImageMaker;
+	private GeminiImageMaker imageMaker;
 
 	private ECDDataBlock ecdDataBlock;
 
-	public ECDSymbolChooser(ECDSymbolManager pamSymbolManager, ECDDataBlock pamDataBlock, String displayName,
+	private GeminiControl geminiControl;
+
+	public ECDSymbolChooser(ECDSymbolManager pamSymbolManager, GeminiControl geminiControl, ECDDataBlock pamDataBlock, String displayName,
 			GeneralProjector projector) {
 		super(pamSymbolManager, pamDataBlock, displayName, projector);
+		this.geminiControl = geminiControl;
 		this.ecdDataBlock = pamDataBlock;
-		ecdImageMaker = new ECDImageMaker();
+//		ecdImageMaker = new ECDImageMaker();
+		imageMaker = new GeminiImageMaker();
 	}
 
 	@Override
@@ -59,17 +61,24 @@ public class ECDSymbolChooser extends PamSymbolChooser{
 		if (ecdSymbolOptions == null || ecdSymbolOptions.getColourArrayType() == null) {
 			return;
 		}
-		ecdImageMaker.setColours(ecdSymbolOptions.getColourArrayType());
-		ecdImageMaker.setOpacity(ecdSymbolOptions.isScaleOpacity());
-		ecdDataBlock.clearAllImages(ecdImageMaker);
+		imageMaker.setColours(ecdSymbolOptions.getColourArrayType());
+		imageMaker.setOpacity(ecdSymbolOptions.isScaleOpacity());
+		ecdDataBlock.clearAllImages(imageMaker);
 		
 	}
 
 	/**
 	 * @return the ecdImageMaker
 	 */
-	public ECDImageMaker getEcdImageMaker() {
-		return ecdImageMaker;
+	public GeminiImageMaker getImageMaker() {
+		return imageMaker;
+	}
+
+	/**
+	 * @return the geminiControl
+	 */
+	public GeminiControl getGeminiControl() {
+		return geminiControl;
 	}
 
 }

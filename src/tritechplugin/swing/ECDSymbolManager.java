@@ -20,7 +20,7 @@ public class ECDSymbolManager extends PamSymbolManager {
 
 	@Override
 	protected PamSymbolChooser createSymbolChooser(String displayName, GeneralProjector projector) {
-		return new ECDSymbolChooser(this, ecdDataBlock, displayName, projector);
+		return new ECDSymbolChooser(this, geminiControl, ecdDataBlock, displayName, projector);
 	}
 
 }

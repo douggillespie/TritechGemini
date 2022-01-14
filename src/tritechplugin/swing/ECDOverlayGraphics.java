@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -24,19 +23,19 @@ import PamView.symbol.PamSymbolChooser;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
+import tritechgemini.imagedata.FanImageData;
+import tritechgemini.imagedata.FanPicksFromData;
+import tritechgemini.imagedata.GeminiImageRecordI;
+import tritechgemini.imagedata.ImageFanMaker;
 import tritechplugin.GeminiControl;
 import tritechplugin.GeminiLocationParams;
 import tritechplugin.GeminiParameters;
 import tritechplugin.dataselect.ECDDataSelectParams;
 import tritechplugin.dataselect.ECDDataSelector;
 import tritechplugin.tritech.ECDDataBlock;
-import tritechplugin.tritech.ecd.ECDRecordSet;
-import tritechplugin.tritech.image.ECDImage;
-import tritechplugin.tritech.image.ECDImageMaker;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
-import PamView.PamColors;
 import PamView.PamKeyItem;
 
 public class ECDOverlayGraphics extends PanelOverlayDraw {
@@ -45,17 +44,25 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 	private ECDDataBlock ecdDataBlock;
 	public static PamSymbol defaultSymbol = new PamSymbol(PamSymbolType.SYMBOL_SQUARE, 10, 10, true, Color.RED, Color.WHITE);
 
-	private ECDRecordSet[] lastECDRecord = new ECDRecordSet[GeminiControl.MAX_SONARS];
+	private GeminiImageRecordI[] lastECDRecord = new GeminiImageRecordI[GeminiControl.MAX_SONARS];
 
-	private ECDImage[] lastImage = new ECDImage[GeminiControl.MAX_SONARS];
+	private FanImageData[] lastImage = new FanImageData[GeminiControl.MAX_SONARS];
+	
+	private BufferedImage[] images = new BufferedImage[GeminiControl.MAX_SONARS];
+	
+	private ImageFanMaker imageFanMaker;
+	
+	private GeminiImageMaker imageMaker;
+	private BufferedImage singleImage;
 
-	private ECDImageMaker defaultImageMaker;
+//	private ECDImageMaker defaultImageMaker;
 
 	public ECDOverlayGraphics(GeminiControl geminiControl, ECDDataBlock ecdDataBlock) {
 		super(defaultSymbol);
 		this.geminiControl = geminiControl;
 		this.ecdDataBlock = ecdDataBlock;
-		defaultImageMaker = new ECDImageMaker();
+		imageFanMaker = new FanPicksFromData(2);
+		imageMaker = new GeminiImageMaker();
 	}
 
 	@Override
@@ -108,10 +115,21 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 		if (ds instanceof ECDDataSelector) {
 			ecdDataSelector = (ECDDataSelector) ds;
 		}
+		PamSymbolChooser symChos = projector.getPamSymbolChooser();
+		ECDSymbolChooser ecdSymbolChooser;
+		boolean combinedImage = false;
+		if (symChos instanceof ECDSymbolChooser) {
+			 ecdSymbolChooser = (ECDSymbolChooser) symChos;
+			 imageMaker = ecdSymbolChooser.getImageMaker();
+			 combinedImage = ecdSymbolChooser.getSymbolOptions().isCombineSingleImage();
+		}
 
-		// draw seprate images for each sonar.
+		// draw separate images for each sonar.
 		// no data units here, so will have to fudge the data selector somewhet. 
-		if (true) {
+		if (combinedImage) {
+			drawCombinedSonars(g, mapProj, mapTime);
+		}
+		else {
 			for (int i = 0; i < nSonar; i++) {
 				if (ecdDataSelector != null && ecdDataSelector.getParams().getCombinationFlag() != ECDDataSelectParams.DATA_SELECT_DISABLE) {
 					if ((ecdDataSelector.getParams().usedSonars & 1<<i) == 0) {
@@ -121,60 +139,61 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 				drawOutline(g, mapProj, mapTime, i);
 			}
 		}
-		else {
-			// draw a combined coloured image for both sonars. 
-			drawAllSonars(g, mapProj, mapTime);
-
-		}
+		
 		return false;
 
 	}
 
-	private void drawAllSonars(Graphics g, MapRectProjector mapProj, long mapTime) {
+	private ImageFanMaker getImageMaker(MapRectProjector mapProj) {
+		return imageFanMaker;
+	}
+
+	private void drawCombinedSonars(Graphics g, MapRectProjector mapProj, long mapTime) {
 		GeminiParameters geminiParams = geminiControl.getGeminiParameters();
 		int nSonar = geminiParams.nSonars;
-		ECDRecordSet[] ecdRecordSets = new ECDRecordSet[nSonar];
-		// draw seprate images for each sonar.
+		GeminiImageRecordI[] ecdRecordSets = new GeminiImageRecordI[nSonar];
+		// draw separate images for each sonar.
 		boolean needImage = false;
 		for (int i = 0; i < nSonar; i++) {
 
 			ecdRecordSets[i] =  ecdDataBlock.findRecordSet(mapTime, i+1);
 			//		System.out.println("Found ECD REcord " + ecdRecordSet);
 			if (ecdRecordSets[i] == null) {
-				return;
+				continue;
 			}
 			if (ecdRecordSets[i] != lastECDRecord[i] || lastImage[0] == null) {
 				needImage = true;
+				lastECDRecord[i] = ecdRecordSets[i];
+				lastImage[i] = imageFanMaker.createFanData(lastECDRecord[i]);
 			}
 		}
-		ECDImage ecdImage;
+		FanImageData ecdImage;
 		if (needImage) {
-			ECDImageMaker ecdImageMaker = getImageMaker(mapProj);
-			lastImage[0] = ecdImage = ecdImageMaker.extractMultiImage(ecdRecordSets);
-		}
-		else {
-			ecdImage = lastImage[0];
+			singleImage = imageMaker.createDualImage(lastImage);
 		}
 
+
+		SnapshotGeometry arrayGeometry = ArrayManager.getArrayManager().getCurrentArray().getSnapshotGeometry(mapTime);
+		double[] arrayAngles = arrayGeometry.getArrayAngles();
+		double streamerHead = 0;
+		try {
+			streamerHead = arrayGeometry.getCentreGPS().getHeading();
+		}
+		catch (Exception e) {
+			
+		}
+		
 		GeminiLocationParams geminiLocation = geminiParams.getGeminiLocation(0);
 		LatLong origin = getStreamerOrigin(0, mapTime);
 		Coordinate3d xyz = geminiLocation.getSonarXYZ();
 		origin = origin.addDistanceMeters(xyz.x, xyz.y, xyz.z); // thats the central position of the sonar. 
 		double hAngle = geminiLocation.getSonarHeadingD();
+		hAngle += streamerHead;
 		double vAngle = geminiLocation.getSonarPitchD();
-		drawRotatedImage(g, mapProj, ecdRecordSets[0], ecdImage, origin, geminiLocation.isFlipLeftRight(), hAngle, 0);
+		
+		drawRotatedImage(g, mapProj, lastImage[0], singleImage, lastECDRecord[0], origin, geminiLocation.isFlipLeftRight(), hAngle, vAngle);
 	}
 
-	private ECDImageMaker getImageMaker(MapRectProjector mapProj) {
-		PamSymbolChooser sc = mapProj.getPamSymbolChooser();
-		if (sc instanceof ECDSymbolChooser) {
-			ECDSymbolChooser ecdSC = (ECDSymbolChooser) sc;
-			if (ecdSC.getEcdImageMaker() != null) {
-				return ecdSC.getEcdImageMaker();
-			}
-		}
-		return defaultImageMaker;
-	}
 	/**
 	 * Better method to work out the translation from image to screen coordinates: <br>
 	 * Use the standard projector to work out where each corner goes, then solve a matrix 
@@ -186,18 +205,19 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 	 */
 	private void drawOutline(Graphics g, MapRectProjector mapProj, long mapTime, int iSonar) {
 
-		ECDImage ecdImage = null;
-		ECDImageMaker ecdImageMaker = getImageMaker(mapProj);
-		ECDRecordSet ecdRecordSet = null;
-		synchronized (ecdImageMaker) {
+		GeminiImageRecordI ecdRecordSet;
+		FanImageData ecdImage;
+		
+		synchronized (imageFanMaker) {
 			//			try {
-			ecdRecordSet = ecdDataBlock.findRecordSet(mapTime, iSonar+1);
+			ecdRecordSet = ecdDataBlock.findRecordSet(mapTime,iSonar+1);
 //					System.out.println("Found ECD REcord " + ecdRecordSet);
 			if (ecdRecordSet == null) {
 				return;
 			}
 			if (ecdRecordSet != lastECDRecord[iSonar] || lastImage[iSonar] == null) {
-				ecdImage = ecdImageMaker.extractImage(ecdRecordSet);
+				ecdImage = imageFanMaker.createFanData(ecdRecordSet);
+				images[iSonar] = imageMaker.createImage(ecdImage); 
 				lastECDRecord[iSonar] = ecdRecordSet;
 				lastImage[iSonar] = ecdImage;
 			}
@@ -231,29 +251,23 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 		double hAngle = geminiLocation.getSonarHeadingD();
 		hAngle += streamerHead;
 		double vAngle = geminiLocation.getSonarPitchD();
-		drawRotatedImage(g, mapProj, ecdRecordSet, ecdImage, origin, geminiLocation.isFlipLeftRight(), hAngle, vAngle);
+		drawRotatedImage(g, mapProj, iSonar, origin, geminiLocation.isFlipLeftRight(), hAngle, vAngle);
 	}
-	private void drawRotatedImage(Graphics g, MapRectProjector mapProj, ECDRecordSet ecdRecordSet, ECDImage ecdImage, LatLong origin, boolean flipLR, double heading, double pitch) {
-		if (ecdImage == null) {
+	private void drawRotatedImage(Graphics g, MapRectProjector mapProj, int iSonar, LatLong origin, boolean flipLR, double heading, double pitch) {
+		FanImageData ecdImage = lastImage[iSonar];
+		BufferedImage image = images[iSonar];
+		GeminiImageRecordI imageRecord = lastECDRecord[iSonar];
+		drawRotatedImage(g, mapProj, ecdImage, image, imageRecord, origin, flipLR, heading, pitch);
+	}
+	
+	private void drawRotatedImage(Graphics g, MapRectProjector mapProj, FanImageData ecdImage, BufferedImage image, GeminiImageRecordI imageRecord, LatLong origin, 
+			boolean flipLR, double heading, double pitch) {
+		if (ecdImage == null || image == null || imageRecord == null) {
 			return;
 		}
-		BufferedImage image = ecdImage.getBufferedImage();
 		int imW = image.getWidth();
 		int imH = image.getHeight();
 		// make a matric of the original coordinates
-//		double[][] oCoord = new double[4][3];
-//		oCoord[0][0] = 0;
-//		oCoord[0][1] = 0;
-//		oCoord[0][2] = 1;
-//		oCoord[1][0] = 0;
-//		oCoord[1][1] = imH;
-//		oCoord[1][2] = 1;
-//		oCoord[2][0] = +imW;
-//		oCoord[2][1] = imH;
-//		oCoord[2][2] = 1;
-//		oCoord[3][0] = +imW;
-//		oCoord[3][1] = 0;
-//		oCoord[3][2] = 1;
 		double[][] oCoord = new double[3][4];
 		oCoord[0][0] = 0;
 		oCoord[1][0] = 0;
@@ -279,8 +293,9 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 		double pixPerM = mapProj.getPixelsPerMetre();
 		int[] cornerX = new int[4];
 		int[] cornerY = new int[4];
-		double yRang = ecdImage.getyRange();
-		double[] xRange = ecdImage.getxRange();
+		double yRang = imageRecord.getMaxRange();//ecdImage.getyRange();
+		double xR = imageRecord.getMaxRange()*Math.sin(60*Math.PI/180.);
+		double[] xRange = {-xR, xR};//ecdImage.getxRange();
 		double xFlip = flipLR ? -1: 1;
 		double[] xLims = {xRange[0]*xFlip, xRange[0]*xFlip, xRange[1]*xFlip, xRange[1]*xFlip};
 		double[] yLims = {yRang, 0, 0, yRang, 0};
@@ -308,13 +323,13 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 		 * where we're going to put the tooltips. 
 		 * 
 		 */
-		Coordinate3d corner = new Coordinate3d();
-		corner.x = (dCoord[0][0] + dCoord[0][1])/2.;
-		corner.y = (dCoord[1][0] + dCoord[1][1])/2.;
-		mapProj.addHoverData(corner, ecdRecordSet);
-		corner.x = (dCoord[0][2] + dCoord[0][3])/2.;
-		corner.y = (dCoord[1][2] + dCoord[1][3])/2.;
-		mapProj.addHoverData(corner, ecdRecordSet);
+//		Coordinate3d corner = new Coordinate3d();
+//		corner.x = (dCoord[0][0] + dCoord[0][1])/2.;
+//		corner.y = (dCoord[1][0] + dCoord[1][1])/2.;
+//		mapProj.addHoverData(corner, imageRecord);
+//		corner.x = (dCoord[0][2] + dCoord[0][3])/2.;
+//		corner.y = (dCoord[1][2] + dCoord[1][3])/2.;
+//		mapProj.addHoverData(corner, ecdRecordSet);
 		//		g.setColor(PamColors.getInstance().getWhaleColor((iSonar+1)));
 		//		g.fillPolygon(cornerX, cornerY, 4);
 
@@ -346,7 +361,7 @@ public class ECDOverlayGraphics extends PanelOverlayDraw {
 
 		int xoffs = (int) cent.getX()*0;
 		int yoffs = (int) cent.getY()*0;
-		g2d.drawImage(image, 0+xoffs, 0+yoffs, imW+xoffs, imH+yoffs, 0, 0, imW, imH, null);
+		g2d.drawImage(image, 0+xoffs, imH+yoffs, imW+xoffs, 0+yoffs, 0, 0, imW, imH, null);
 
 
 		g2d.setTransform(oldTansofrm);

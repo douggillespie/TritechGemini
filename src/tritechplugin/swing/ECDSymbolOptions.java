@@ -9,7 +9,17 @@ public class ECDSymbolOptions extends PamSymbolOptions {
 	
 	private ColourArrayType colourArrayType = ColourArrayType.FIRE;
 	
+	/**
+	 * Scale the opacity by the image value. 
+	 */
 	private boolean scaleOpacity = true;
+	
+	/**
+	 * If multi sonar are present, then make a single image (using
+	 * the alignment of the first image) and use the values for each
+	 * image for a different primary colour component.  
+	 */
+	private boolean combineSingleImage = false;
 
 	public ECDSymbolOptions() {
 		// TODO Auto-generated constructor stub
@@ -41,6 +51,20 @@ public class ECDSymbolOptions extends PamSymbolOptions {
 	 */
 	public void setScaleOpacity(boolean scaleOpacity) {
 		this.scaleOpacity = scaleOpacity;
+	}
+
+	/**
+	 * @return the combineSingleImage
+	 */
+	public boolean isCombineSingleImage() {
+		return combineSingleImage;
+	}
+
+	/**
+	 * @param combineSingleImage the combineSingleImage to set
+	 */
+	public void setCombineSingleImage(boolean combineSingleImage) {
+		this.combineSingleImage = combineSingleImage;
 	}
 
 }

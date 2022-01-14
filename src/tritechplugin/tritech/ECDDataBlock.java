@@ -8,10 +8,9 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import dataMap.OfflineDataMap;
 import pamScrollSystem.ViewLoadObserver;
+import tritechgemini.imagedata.GeminiImageRecordI;
 import tritechplugin.GeminiProcess;
 import tritechplugin.dataselect.ECDDataSelectCreator;
-import tritechplugin.tritech.ecd.ECDRecordSet;
-import tritechplugin.tritech.image.ECDImageMaker;
 
 public class ECDDataBlock extends PamDataBlock<ECDDataUnit> {
 
@@ -31,7 +30,7 @@ public class ECDDataBlock extends PamDataBlock<ECDDataUnit> {
 	 * @param iSonar sonar id (indexed from 1)
 	 * @return a record set (or null)
 	 */
-	public ECDRecordSet findRecordSet(long timeMillis, int iSonar) {
+	public GeminiImageRecordI findRecordSet(long timeMillis, int iSonar) {
 		ECDDataUnit ecdDataUnit = null;
 		synchronized (getSynchLock()) {
 			ListIterator<ECDDataUnit> it = this.getListIterator(-1);
@@ -76,8 +75,8 @@ public class ECDDataBlock extends PamDataBlock<ECDDataUnit> {
 	 * Clear all the image data, so that it gets recreated. 
 	 * @param ecdImageMaker 
 	 */
-	public void clearAllImages(ECDImageMaker ecdImageMaker) {
-		synchronized (ecdImageMaker) {
+	public void clearAllImages(Object synchObject) {
+		synchronized (synchObject) {
 			ListIterator<ECDDataUnit> iter = getListIterator(0);
 			while (iter.hasNext()) {
 				ECDDataUnit du = iter.next();

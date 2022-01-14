@@ -12,8 +12,9 @@ import dataMap.OfflineDataMap;
 import dataMap.filemaps.FileDataMapPoint;
 import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.ViewLoadObserver;
+import tritechgemini.fileio.CatalogException;
+import tritechgemini.fileio.GeminiFileCatalog;
 import tritechplugin.GeminiControl;
-import tritechplugin.tritech.ecd.ECDFile;
 
 public class OfflineEDCfileServer extends OfflineFileServer<FileDataMapPoint> {
 
@@ -45,9 +46,15 @@ public class OfflineEDCfileServer extends OfflineFileServer<FileDataMapPoint> {
 			if (mapPoint.getStartTime() > offlineDataLoadInfo.getEndMillis()) {
 				break;
 			}
-			ECDFile ecdFile = new ECDFile(mapPoint.getSoundFile());
-			if (ecdFile.isFileOk()) {
-				ECDDataUnit ecdDataUnit = new ECDDataUnit(mapPoint.getStartTime(), ecdFile);
+			GeminiFileCatalog geminiCatalog;
+			try {
+				geminiCatalog = GeminiFileCatalog.getFileCatalog(mapPoint.getSoundFile().getAbsolutePath(), true);
+			} catch (CatalogException e) {
+				return false;
+			}
+//					ECDFile ecdFile = new ECDFile(mapPoint.getSoundFile());
+			if (geminiCatalog != null) {
+				ECDDataUnit ecdDataUnit = new ECDDataUnit(mapPoint.getStartTime(), geminiCatalog);
 				ecdDataBlock.addPamData(ecdDataUnit);
 			}
 		}
@@ -75,6 +82,7 @@ public class OfflineEDCfileServer extends OfflineFileServer<FileDataMapPoint> {
 		 */
 		boolean useFileName = false;
 		long t = 0;
+		GeminiFileCatalog fileCat = null;
 		if (useFileName) {
 			// this is no good since file times are in local, but records inside them are UTC. 
 			String name = file.getName();
@@ -88,17 +96,26 @@ public class OfflineEDCfileServer extends OfflineFileServer<FileDataMapPoint> {
 			}
 			// might now be lucky! 
 			t = fileDate.getTimeFromFile(new File(name));
+			long[] ts = new long[2];
+			ts[0] = t;
+//			ts[1] = t+300000;
+//			ts[0] = t - 300000;
+			return ts;
 		}
 		else {
 			// but this is going to take a lot longer, so might be worth storing a data map. 
 			// about 50ms per file, and 1000's of files per day 
-			t = ECDFile.findFirstRecordTime(file);
+//			t = ECDFile.findFirstRecordTime(file);
+			try {
+				fileCat = GeminiFileCatalog.getFileCatalog(file.getAbsolutePath(), true);
+			} catch (CatalogException e) {
+				return null;
+			}
+			long[] tl = new long[2];
+			tl[0] = fileCat.getFirstRecordTime();
+			tl[1] = fileCat.getLastRecordTime();
+			return tl;
 		}
-		long[] ts = new long[2];
-		ts[0] = t;
-//		ts[1] = t+300000;
-//		ts[0] = t - 300000;
-		return ts;
 	}
 
 	private int countDigits(String name) {

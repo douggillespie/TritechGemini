@@ -1,18 +1,17 @@
 package tritechplugin.tritech;
 
-import java.util.ArrayList;
 
 import PamguardMVC.PamDataUnit;
-import tritechplugin.tritech.ecd.ECDFile;
-import tritechplugin.tritech.ecd.ECDRecordSet;
+import tritechgemini.fileio.GeminiFileCatalog;
+import tritechgemini.imagedata.GeminiImageRecordI;
 
 public class ECDDataUnit extends PamDataUnit {
 
-	private ECDFile ecdFile;
+	private GeminiFileCatalog geminiFileCatalog;
 
-	public ECDDataUnit(long timeMilliseconds, ECDFile ecdFile) {
+	public ECDDataUnit(long timeMilliseconds, GeminiFileCatalog geminiFileCatalog) {
 		super(timeMilliseconds);
-		this.ecdFile = ecdFile;
+		this.geminiFileCatalog = geminiFileCatalog;
 	}
 	/**
 	 * Used in viewer to get a single image as close in time as possible to the 
@@ -21,26 +20,27 @@ public class ECDDataUnit extends PamDataUnit {
 	 * @param iSonar sonar id (indexed from 1)
 	 * @return a record set (or null)
 	 */
-	public ECDRecordSet findRecordSet(long timeMillis, int iSonar) {
-		if (ecdFile == null) {
+	public GeminiImageRecordI findRecordSet(long timeMillis, int iSonar) {
+		if (geminiFileCatalog == null) {
 			return null;
 		}
-		ArrayList<ECDRecordSet> ecdRecs = ecdFile.getEmptyECDRecords();
-		for (ECDRecordSet ecdRecordSet : ecdRecs) {
-			if (ecdRecordSet.getTimeMillis() > timeMillis) { //   in summer ! - (3600000L)
-				if (ecdRecordSet.getSonar() == iSonar) {
-					return ecdRecordSet;
-				}
-			}
-		}
-		return null;
+		GeminiImageRecordI geminiRecord = geminiFileCatalog.findRecordForIndexandTime(iSonar, timeMillis);
+//		ArrayList<ECDRecordSet> ecdRecs = ecdFile.getEmptyECDRecords();
+//		for (ECDRecordSet ecdRecordSet : ecdRecs) {
+//			if (ecdRecordSet.getTimeMillis() > timeMillis) { //   in summer ! - (3600000L)
+//				if (ecdRecordSet.getSonar() == iSonar) {
+//					return ecdRecordSet;
+//				}
+//			}
+//		}
+		return geminiRecord;
 	}
 
 	public void clearRecordImages() {
-		ArrayList<ECDRecordSet> ecdRecs = ecdFile.getEmptyECDRecords();
-		for (ECDRecordSet ecdRecordSet : ecdRecs) {
-			ecdRecordSet.freeImageData();
+		if (geminiFileCatalog == null) {
+			return;
 		}
+		geminiFileCatalog.freeAllImageData();
 		
 	}
 
