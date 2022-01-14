@@ -49,7 +49,7 @@ import networkTransfer.receive.BuoyStatusDataUnit;
 import networkTransfer.receive.NetworkReceiver;
 import printscreen.PrintScreenControl;
 import rockBlock.RockBlockControl;
-import tritechgemini.GeminiControl;
+import tritechplugin.GeminiControl;
 import turbineops.TurbineOperationControl;
 import GPS.GpsDataUnit;
 import Map.MapController;

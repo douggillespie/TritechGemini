@@ -4,8 +4,8 @@ import PamView.GeneralProjector;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
-import tritechgemini.GeminiControl;
 import tritechgemini.tritech.ECDDataBlock;
+import tritechplugin.GeminiControl;
 
 public class ECDSymbolManager extends PamSymbolManager {
 

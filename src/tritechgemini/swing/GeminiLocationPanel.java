@@ -17,7 +17,7 @@ import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
-import tritechgemini.GeminiLocationParams;
+import tritechplugin.GeminiLocationParams;
 
 public class GeminiLocationPanel {
 

@@ -6,7 +6,7 @@ import java.awt.Component;
 import javax.swing.JPanel;
 
 import PamView.panel.PamPanel;
-import tritechgemini.GeminiControl;
+import tritechplugin.GeminiControl;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
 

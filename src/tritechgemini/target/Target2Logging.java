@@ -9,8 +9,8 @@ import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
-import tritechgemini.GeminiControl;
 import tritechgemini.status.GeminiStatusLogging;
+import tritechplugin.GeminiControl;
 
 public class Target2Logging extends SQLLogging {
 

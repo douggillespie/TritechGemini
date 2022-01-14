@@ -13,8 +13,8 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.datamenus.DataMenuParent;
 import annotation.handler.AnnotationHandler;
-import tritechgemini.GeminiProcess;
 import tritechgemini.dataselect.TargetDataSelectCreator;
+import tritechplugin.GeminiProcess;
 
 public class Target2DataBlock extends PamDataBlock<Target2DataUnit> {
 

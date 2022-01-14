@@ -3,8 +3,8 @@ package tritechgemini.status;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
-import tritechgemini.GeminiControl;
-import tritechgemini.GeminiProcess;
+import tritechplugin.GeminiControl;
+import tritechplugin.GeminiProcess;
 
 public class GeminiStatusDataBlock extends PamDataBlock<GeminiStatusDataUnit> {
 

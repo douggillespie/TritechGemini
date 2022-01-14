@@ -21,9 +21,9 @@ import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import pamViewFX.fxNodes.PamTextField;
-import tritechgemini.GeminiControl;
 import tritechgemini.status.GeminiStatusDataBlock;
 import tritechgemini.status.GeminiStatusDataUnit;
+import tritechplugin.GeminiControl;
 
 public class GeminiStatusPanel {
 
